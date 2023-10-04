@@ -13,7 +13,7 @@ interface Props {
   author: {
     _id: string;
     name: string;
-    imageUrl: string;
+    picture: string;
   };
   upVotes: number;
   views: number;
@@ -57,7 +57,7 @@ const QuestionCard = ({
       </div>
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
-          imgUrl="/assets/icons/avatar.svg"
+          imgUrl={author.picture}
           alt="User"
           value={author.name}
           title={` - asked ${getTimestamp(createdAt)}`}
