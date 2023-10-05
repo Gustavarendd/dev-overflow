@@ -1,10 +1,6 @@
 import Filter from '@/components/shared/Filter';
-import NoResult from '@/components/shared/NoResult';
-
 import LocalSearch from '@/components/shared/search/LocalSearch';
-
 import { UserFilters } from '@/constants/filters';
-
 import { getAllUsers } from '@/lib/actions/user.action';
 import UserCard from '@/components/cards/UserCard';
 import Link from 'next/link';
