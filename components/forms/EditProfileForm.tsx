@@ -17,8 +17,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { EditProfileFormSchema } from '@/lib/validations';
-import { userInfo } from 'os';
+import { Textarea } from '@/components/ui/textarea';
+import { ProfileFormSchema } from '@/lib/validations';
 import { updateUser } from '@/lib/actions/user.action';
 
 interface Props {
@@ -32,10 +32,9 @@ const EditProfileForm = ({ mongoUser }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parsedUserDetails = mongoUser ? JSON.parse(mongoUser) : '';
-  console.log(parsedUserDetails);
 
-  const form = useForm<z.infer<typeof EditProfileFormSchema>>({
-    resolver: zodResolver(EditProfileFormSchema),
+  const form = useForm<z.infer<typeof ProfileFormSchema>>({
+    resolver: zodResolver(ProfileFormSchema),
     defaultValues: {
       name: parsedUserDetails.name || '',
       username: parsedUserDetails.username || '',
@@ -45,7 +44,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof EditProfileFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof ProfileFormSchema>) => {
     setIsSubmitting(true);
 
     try {
@@ -71,7 +70,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex w-full flex-col gap-10"
+        className="grid grid-cols-1 sm:grid-cols-2 w-full gap-10"
       >
         <FormField
           control={form.control}
@@ -83,7 +82,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -101,7 +100,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -119,8 +118,9 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
+                  type="url"
                   placeholder="https://www.example.com"
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -134,11 +134,11 @@ const EditProfileForm = ({ mongoUser }: Props) => {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col">
               <FormLabel className="paragraph-semibold text-dark400_light800">
-                Location<span className="text-primary-500"> *</span>
+                Location
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -150,13 +150,16 @@ const EditProfileForm = ({ mongoUser }: Props) => {
           control={form.control}
           name="bio"
           render={({ field }) => (
-            <FormItem className="flex w-full flex-col">
+            <FormItem className="flex w-full flex-col sm:col-span-2">
               <FormLabel className="paragraph-semibold text-dark400_light800">
-                Bio<span className="text-primary-500"> *</span>
+                Bio{' '}
+                <span className="small-medium text-light-400">
+                  (max 150 characters)
+                </span>
               </FormLabel>
               <FormControl className="mt-3.5">
-                <Input
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[98px] border"
+                <Textarea
+                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[98px] border"
                   {...field}
                 />
               </FormControl>
@@ -164,13 +167,13 @@ const EditProfileForm = ({ mongoUser }: Props) => {
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-end sm:col-span-2">
           <Button
             type="submit"
             className="primary-gradient w-fit !text-light-900"
             disabled={isSubmitting}
           >
-            Update Profile
+            {isSubmitting ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </form>

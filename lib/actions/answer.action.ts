@@ -10,7 +10,6 @@ import {
 } from './shared.types';
 import { revalidatePath } from 'next/cache';
 import Interaction from '@/database/interaction.model';
-import { Tag } from 'lucide-react';
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {

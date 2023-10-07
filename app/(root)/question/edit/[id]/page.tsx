@@ -14,6 +14,10 @@ const Page = async ({ params }: ParamsProps) => {
 
   const result = await getQuestionById({ questionId: params.id });
 
+  if (result.author.clerkId !== userId) {
+    redirect('/');
+  }
+
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">Edit Question</h1>
