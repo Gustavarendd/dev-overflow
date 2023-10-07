@@ -10,6 +10,7 @@ import {
   GetQuestionByIdParams,
   QuestionVoteParams,
   DeleteQuestionParams,
+  EditQuestionParams,
 } from './shared.types';
 import { revalidatePath } from 'next/cache';
 import Answer from '@/database/answer.model';
@@ -185,6 +186,29 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
       { questions: questionId },
       { $pull: { questions: questionId } },
     );
+
+    revalidatePath(path);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function editQuestion(params: EditQuestionParams) {
+  try {
+    connectDB();
+    const { questionId, title, content, path } = params;
+
+    const question = await Question.findById({ _id: questionId }).populate(
+      'tags',
+    );
+    if (!question) {
+      throw new Error('Question not found');
+    }
+
+    question.title = title;
+    question.content = content;
+
+    await question.save();
 
     revalidatePath(path);
   } catch (error) {

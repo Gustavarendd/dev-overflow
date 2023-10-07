@@ -1,0 +1,181 @@
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import React, { useState } from 'react';
+
+import { useRouter, usePathname } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { EditProfileFormSchema } from '@/lib/validations';
+import { userInfo } from 'os';
+import { updateUser } from '@/lib/actions/user.action';
+
+interface Props {
+  mongoUser: string;
+}
+
+const EditProfileForm = ({ mongoUser }: Props) => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const parsedUserDetails = mongoUser ? JSON.parse(mongoUser) : '';
+  console.log(parsedUserDetails);
+
+  const form = useForm<z.infer<typeof EditProfileFormSchema>>({
+    resolver: zodResolver(EditProfileFormSchema),
+    defaultValues: {
+      name: parsedUserDetails.name || '',
+      username: parsedUserDetails.username || '',
+      bio: parsedUserDetails.bio || '',
+      location: parsedUserDetails.location || '',
+      portfolioWebsite: parsedUserDetails.portfolioWebsite || '',
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof EditProfileFormSchema>) => {
+    setIsSubmitting(true);
+
+    try {
+      await updateUser({
+        clerkId: parsedUserDetails.clerkId,
+        updateData: {
+          name: values.name,
+          username: values.username,
+          bio: values.bio,
+          location: values.location,
+          portfolioWebsite: values.portfolioWebsite,
+        },
+        path: pathname,
+      });
+      router.push(`/profile/${parsedUserDetails.clerkId}`);
+    } catch (error) {
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex w-full flex-col gap-10"
+      >
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Full Name<span className="text-primary-500"> *</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Username<span className="text-primary-500"> *</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="portfolioWebsite"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Portfolio Link
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  placeholder="https://www.example.com"
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Location<span className="text-primary-500"> *</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col">
+              <FormLabel className="paragraph-semibold text-dark400_light800">
+                Bio<span className="text-primary-500"> *</span>
+              </FormLabel>
+              <FormControl className="mt-3.5">
+                <Input
+                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[98px] border"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-red-500" />
+            </FormItem>
+          )}
+        />
+        <div className="flex justify-end">
+          <Button
+            type="submit"
+            className="primary-gradient w-fit !text-light-900"
+            disabled={isSubmitting}
+          >
+            Update Profile
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};
+
+export default EditProfileForm;
