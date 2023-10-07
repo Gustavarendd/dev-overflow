@@ -53,3 +53,15 @@ export const formatNumber = (number: number): string => {
     return number.toString();
   }
 };
+
+export const getJoinedDate = (date: Date): string => {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    throw new Error('Invalid date object');
+  }
+
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+  };
+  return date.toLocaleDateString(undefined, options);
+};

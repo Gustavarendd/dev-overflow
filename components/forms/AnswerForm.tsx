@@ -67,7 +67,7 @@ const AnswerForm = ({ userId, questionId, question }: Props) => {
 
   return (
     <div>
-      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2 mt-11">
         <h4 className="paragraph-semibold text-dark400_light800">
           Write your answer here
         </h4>

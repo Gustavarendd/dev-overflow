@@ -9,9 +9,11 @@ import {
   GetQuestionsParams,
   GetQuestionByIdParams,
   QuestionVoteParams,
-  ToggleSaveQuestionParams,
+  DeleteQuestionParams,
 } from './shared.types';
 import { revalidatePath } from 'next/cache';
+import Answer from '@/database/answer.model';
+import Interaction from '@/database/interaction.model';
 
 export async function getQuestions(params: GetQuestionsParams) {
   try {
@@ -19,7 +21,11 @@ export async function getQuestions(params: GetQuestionsParams) {
 
     const questions = await Question.find({})
       .populate({ path: 'tags', model: Tag })
-      .populate({ path: 'author', model: User })
+      .populate({
+        path: 'author',
+        model: User,
+        select: 'clerkId _id name picture',
+      })
       .sort({ createdAt: -1 });
 
     return { questions };
@@ -50,7 +56,7 @@ export async function createQuestion(params: CreateQuestionParams) {
         },
         {
           $setOnInsert: { name: tag },
-          $push: { question: question._id },
+          $push: { questions: question._id },
         },
         {
           upsert: true,
@@ -163,6 +169,25 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     revalidatePath(path);
   } catch (error) {
     console.log(error);
+    throw error;
+  }
+}
+
+export async function deleteQuestion(params: DeleteQuestionParams) {
+  try {
+    connectDB();
+    const { questionId, path } = params;
+
+    await Question.deleteOne({ _id: questionId });
+    await Answer.deleteMany({ question: questionId });
+    await Interaction.deleteMany({ question: questionId });
+    await Tag.updateMany(
+      { questions: questionId },
+      { $pull: { questions: questionId } },
+    );
+
+    revalidatePath(path);
+  } catch (error) {
     throw error;
   }
 }
