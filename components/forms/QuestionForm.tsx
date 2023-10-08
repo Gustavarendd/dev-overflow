@@ -39,11 +39,13 @@ const QuestionForm = ({ mongoUserId, type, questionDetails }: Props) => {
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const parsedQuestionDetails = questionDetails
-    ? JSON.parse(questionDetails)
-    : '';
+  const parsedQuestionDetails =
+    (questionDetails && JSON.parse(questionDetails)) || {};
 
-  const groupedTags = parsedQuestionDetails.tags.map((tag: ITag) => tag.name);
+  const groupedTags =
+    (parsedQuestionDetails.tags &&
+      parsedQuestionDetails.tags.map((tag: ITag) => tag.name)) ||
+    [];
 
   const form = useForm<z.infer<typeof QuestionsFormSchema>>({
     resolver: zodResolver(QuestionsFormSchema),
