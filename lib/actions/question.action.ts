@@ -15,18 +15,24 @@ import {
 import { revalidatePath } from 'next/cache';
 import Answer from '@/database/answer.model';
 import Interaction from '@/database/interaction.model';
+import { FilterQuery } from 'mongoose';
 
 export async function getQuestions(params: GetQuestionsParams) {
   try {
     connectDB();
+    const { searchQuery } = params;
+    const query: FilterQuery<typeof Question> = {};
 
-    const questions = await Question.find({})
+    if (searchQuery) {
+      query.$for = [
+        { title: { $regex: new RegExp(searchQuery, 'i') } },
+        { content: { $regex: new RegExp(searchQuery, 'i') } },
+      ];
+    }
+
+    const questions = await Question.find(query)
       .populate({ path: 'tags', model: Tag })
-      .populate({
-        path: 'author',
-        model: User,
-        select: 'clerkId _id name picture',
-      })
+      .populate({ path: 'author', model: User })
       .sort({ createdAt: -1 });
 
     return { questions };

@@ -7,10 +7,11 @@ import { QuestionFilters } from '@/constants/filters';
 
 import { getSavedQuestion } from '@/lib/actions/user.action';
 import { auth } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 export default async function Home() {
   const { userId } = auth();
-  if (!userId) return null;
+  if (!userId) return redirect('/sign-in');
   const result = await getSavedQuestion({
     clerkId: userId,
   });
