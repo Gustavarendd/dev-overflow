@@ -98,8 +98,10 @@ const AnswerForm = ({ userId, questionId, question }: Props) => {
                 <FormControl className="mt-3.5">
                   <Editor
                     apiKey={process.env.NEXT_PUBLIC_TINY_EDITOR_API_KEY}
-                    //@ts-ignore
-                    onInit={(evt, editor) => (editorRef.current = editor)}
+                    onInit={(evt, editor) => {
+                      // @ts-ignore
+                      editorRef.current = editor;
+                    }}
                     onBlur={field.onBlur}
                     onEditorChange={content => field.onChange(content)}
                     init={{
@@ -123,7 +125,7 @@ const AnswerForm = ({ userId, questionId, question }: Props) => {
                         'table',
                       ],
                       toolbar:
-                        'undo redo |' +
+                        'undo redo | ' +
                         'codesample | bold italic forecolor | alignleft aligncenter |' +
                         'alignright alignjustify | bullist numlist',
                       content_style:

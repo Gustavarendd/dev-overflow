@@ -40,7 +40,7 @@ const QuestionForm = ({ mongoUserId, type, questionDetails }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const parsedQuestionDetails =
-    (questionDetails && JSON.parse(questionDetails)) || {};
+    (questionDetails && JSON.parse(questionDetails)) || '';
 
   const groupedTags =
     (parsedQuestionDetails.tags &&

@@ -38,13 +38,42 @@ export async function getAllAnswers(params: GetAnswersParams) {
   try {
     connectDB();
 
-    const { questionId, sortBy, page, pageSize } = params;
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params;
+
+    let sortOptions = {};
+
+    switch (sortBy) {
+      case 'highestUpvotes':
+        sortOptions = { upvotes: -1 };
+        break;
+      case 'lowestUpvotes':
+        sortOptions = { upvotes: 1 };
+        break;
+      case 'recent':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'old':
+        sortOptions = { createdAt: 1 };
+        break;
+
+      default:
+        sortOptions = { createdAt: -1 };
+        break;
+    }
+
+    const skipAmount = (page - 1) * pageSize;
 
     const answers = await Answer.find({ question: questionId })
       .populate('author', '_id clerkId name picture')
-      .sort({ createdAt: -1 });
+      .skip(skipAmount)
+      .limit(pageSize)
+      .sort(sortOptions);
 
-    return { answers };
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+
+    const isNext = totalAnswers > skipAmount + answers.length;
+
+    return { answers, isNext };
   } catch (error) {
     console.log(error);
     throw error;

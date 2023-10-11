@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -8,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { formUrlQuery } from '@/lib/utils';
 
 interface Props {
   filters: {
@@ -19,9 +21,27 @@ interface Props {
 }
 
 const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const paramFilter = searchParams.get('filter');
+
+  const onChangeHandler = (value: string) => {
+    const newUrl = formUrlQuery({
+      params: searchParams.toString(),
+      key: 'filter',
+      value,
+    });
+
+    router.push(newUrl, { scroll: false });
+  };
+
   return (
     <div className={`relative ${containerClasses}`}>
-      <Select>
+      <Select
+        defaultValue={paramFilter || undefined}
+        onValueChange={value => onChangeHandler(value)}
+      >
         <SelectTrigger
           className={`${otherClasses} body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5`}
         >
@@ -35,6 +55,7 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
               <SelectItem
                 key={filter.value}
                 value={filter.value}
+                onClick={() => onChangeHandler(filter.value)}
               >
                 {filter.name}
               </SelectItem>

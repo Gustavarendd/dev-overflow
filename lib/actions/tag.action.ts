@@ -35,11 +35,44 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectDB();
-    const { page = 1, pageSize = 20, filter, searchQuery } = params;
+    const { page = 1, pageSize = 10, filter, searchQuery } = params;
 
-    const tags = await Tag.find({});
+    const query: FilterQuery<typeof Tag> = {};
 
-    return { tags };
+    if (searchQuery) {
+      query.$or = [{ name: { $regex: new RegExp(searchQuery, 'i') } }];
+    }
+
+    let sortOptions = {};
+
+    switch (filter) {
+      case 'recent':
+        sortOptions = { createdAt: -1 };
+        break;
+      case 'old':
+        sortOptions = { createdAt: 1 };
+        break;
+      case 'popular':
+        sortOptions = { questions: -1 };
+        break;
+      case 'name':
+        sortOptions = { name: 1 };
+        break;
+
+      default:
+        break;
+    }
+    const skipAmount = (page - 1) * pageSize;
+
+    const tags = await Tag.find(query)
+      .skip(skipAmount)
+      .limit(pageSize)
+      .sort(sortOptions);
+
+    const totalTags = await Tag.countDocuments(query);
+    const isNext = totalTags > skipAmount + tags.length;
+
+    return { tags, isNext };
   } catch (error) {
     console.log(error);
     throw error;
@@ -53,6 +86,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
 
     const tagFilter: FilterQuery<ITag> = { _id: tagId };
 
+    const skipAmount = (page - 1) * pageSize;
+
     const tag = await Tag.findOne(tagFilter).populate({
       path: 'questions',
       model: Question,
@@ -60,6 +95,8 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
         ? { title: { $regex: searchQuery, $options: 'i' } }
         : {},
       options: {
+        skip: skipAmount,
+        limit: pageSize,
         sort: { createdAt: -1 },
       },
       populate: [
@@ -70,10 +107,19 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
     if (!tag) {
       throw new Error('Tag not found');
     }
+    const totalTagQuestions = await Tag.findOne(tagFilter).populate({
+      path: 'questions',
+      model: Question,
+      match: searchQuery
+        ? { title: { $regex: searchQuery, $options: 'i' } }
+        : {},
+    });
+
+    const isNext = totalTagQuestions.questions.length > pageSize + skipAmount;
 
     const questions = tag.questions;
 
-    return { tagTitle: tag.name, questions };
+    return { tagTitle: tag.name, questions, isNext };
   } catch (error) {
     console.log(error);
     throw error;
