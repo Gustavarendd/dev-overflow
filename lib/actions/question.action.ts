@@ -104,8 +104,22 @@ export async function createQuestion(params: CreateQuestionParams) {
       $push: { tags: { $each: tagDocuments } },
     });
 
+    await Interaction.create({
+      user: author,
+      action: 'ask_question',
+      question: question._id,
+      tags: tagDocuments,
+    });
+
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: 5 },
+    });
+
     revalidatePath(path);
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 }
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
@@ -135,18 +149,28 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     const { questionId, userId, hasDownVoted, hasUpVoted, path } = params;
 
     let updatedQuery = {};
+    let repForAuthor = 0;
+    let repForUpvoter = 0;
 
     if (hasUpVoted) {
       updatedQuery = {
         $pull: { upvotes: userId },
       };
+      repForAuthor = -10;
+      repForUpvoter = -1;
     } else if (hasDownVoted) {
       updatedQuery = {
         $pull: { downvotes: userId },
         $push: { upvotes: userId },
       };
+      repForAuthor = 12;
+      repForUpvoter = 2;
     } else {
-      updatedQuery = { $addToSet: { upvotes: userId } };
+      updatedQuery = {
+        $addToSet: { upvotes: userId },
+      };
+      repForAuthor = 10;
+      repForUpvoter = 1;
     }
 
     const question = await Question.findByIdAndUpdate(
@@ -159,7 +183,17 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
       throw new Error('Question not found');
     }
 
-    // Increment author rep
+    if (JSON.stringify(question.author).replaceAll(`"`, '') !== userId) {
+      // Increment author rep
+      await User.findByIdAndUpdate(question.author, {
+        $inc: { reputation: repForAuthor },
+      });
+
+      // Increment upvoters rep
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: repForUpvoter },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
@@ -175,18 +209,26 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     const { questionId, userId, hasDownVoted, hasUpVoted, path } = params;
 
     let updatedQuery = {};
+    let repForAuthor = 0;
+    let repForDownvoter = 0;
 
     if (hasDownVoted) {
       updatedQuery = {
         $pull: { downvotes: userId },
       };
+      repForAuthor = 2;
+      repForDownvoter = 1;
     } else if (hasUpVoted) {
       updatedQuery = {
         $pull: { upvotes: userId },
         $push: { downvotes: userId },
       };
+      repForAuthor = -12;
+      repForDownvoter = -2;
     } else {
       updatedQuery = { $addToSet: { downvotes: userId } };
+      repForAuthor = -2;
+      repForDownvoter = -1;
     }
 
     const question = await Question.findByIdAndUpdate(
@@ -198,8 +240,17 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     if (!question) {
       throw new Error('Question not found');
     }
+    if (JSON.stringify(question.author).replaceAll(`"`, '') !== userId) {
+      // Decrement author rep
+      await User.findByIdAndUpdate(question.author, {
+        $inc: { reputation: repForAuthor },
+      });
 
-    // Decrement author rep
+      // Decrement downvoters rep
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: repForDownvoter },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
@@ -213,6 +264,8 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
     connectDB();
     const { questionId, path } = params;
 
+    const question = await Question.findById(questionId);
+
     await Question.deleteOne({ _id: questionId });
     await Answer.deleteMany({ question: questionId });
     await Interaction.deleteMany({ question: questionId });
@@ -220,6 +273,10 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
       { questions: questionId },
       { $pull: { questions: questionId } },
     );
+
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: -5 },
+    });
 
     revalidatePath(path);
   } catch (error) {

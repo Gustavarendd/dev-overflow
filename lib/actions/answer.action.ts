@@ -10,6 +10,7 @@ import {
 } from './shared.types';
 import { revalidatePath } from 'next/cache';
 import Interaction from '@/database/interaction.model';
+import User from '@/database/user.model';
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
@@ -23,9 +24,22 @@ export async function createAnswer(params: CreateAnswerParams) {
       question,
     });
 
-    await Question.findByIdAndUpdate(question, {
+    const questionObject = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
+
+    await Interaction.create({
+      user: author,
+      action: 'answer',
+      question,
+      answer: newAnswer._id,
+      tags: questionObject.tags,
+    });
+    if (JSON.stringify(questionObject.author).replaceAll(`"`, '') !== author) {
+      await User.findByIdAndUpdate(author, {
+        $inc: { reputation: 10 },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
@@ -87,18 +101,26 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     const { answerId, userId, hasDownVoted, hasUpVoted, path } = params;
 
     let updatedQuery = {};
+    let repForAuthor = 0;
+    let repForUpvoter = 0;
 
     if (hasUpVoted) {
       updatedQuery = {
         $pull: { upvotes: userId },
       };
+      repForAuthor = -10;
+      repForUpvoter = -1;
     } else if (hasDownVoted) {
       updatedQuery = {
         $pull: { downvotes: userId },
         $push: { upvotes: userId },
       };
+      repForAuthor = 12;
+      repForUpvoter = 2;
     } else {
       updatedQuery = { $addToSet: { upvotes: userId } };
+      repForAuthor = 10;
+      repForUpvoter = 1;
     }
 
     const answer = await Answer.findByIdAndUpdate(answerId, updatedQuery, {
@@ -108,9 +130,17 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
     if (!answer) {
       throw new Error('Answer not found');
     }
+    if (JSON.stringify(answer.author).replaceAll(`"`, '') !== userId) {
+      // Increment author rep
+      await User.findByIdAndUpdate(answer.author, {
+        $inc: { reputation: repForAuthor },
+      });
 
-    // Increment author rep
-
+      // Increment voters rep
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: repForUpvoter },
+      });
+    }
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -125,18 +155,26 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     const { answerId, userId, hasDownVoted, hasUpVoted, path } = params;
 
     let updatedQuery = {};
+    let repForAuthor = 0;
+    let repForDownvoter = 0;
 
     if (hasDownVoted) {
       updatedQuery = {
         $pull: { downvotes: userId },
       };
+      repForAuthor = 2;
+      repForDownvoter = 1;
     } else if (hasUpVoted) {
       updatedQuery = {
         $pull: { upvotes: userId },
         $push: { downvotes: userId },
       };
+      repForAuthor = -12;
+      repForDownvoter = -2;
     } else {
       updatedQuery = { $addToSet: { downvotes: userId } };
+      repForAuthor = -2;
+      repForDownvoter = -1;
     }
 
     const answer = await Answer.findByIdAndUpdate(answerId, updatedQuery, {
@@ -146,8 +184,17 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     if (!answer) {
       throw new Error('Answer not found');
     }
+    if (JSON.stringify(answer.author).replaceAll(`"`, '') !== userId) {
+      // Decrement author rep
+      await User.findByIdAndUpdate(answer.author, {
+        $inc: { reputation: repForAuthor },
+      });
 
-    // Increment author rep
+      // Decrement voters rep
+      await User.findByIdAndUpdate(userId, {
+        $inc: { reputation: repForDownvoter },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
@@ -162,6 +209,7 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
     const { answerId, path } = params;
 
     const answer = await Answer.findById(answerId);
+    const question = await Question.findOne({ _id: answer.question });
     if (!answer) {
       throw new Error('Answer not found');
     }
@@ -172,6 +220,12 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
       { $pull: { answers: answerId } },
     );
     await Interaction.deleteMany({ answer: answerId });
+
+    if (JSON.stringify(answer.author) !== JSON.stringify(question.author)) {
+      await User.findByIdAndUpdate(answer.author, {
+        $inc: { reputation: -10 },
+      });
+    }
 
     revalidatePath(path);
   } catch (error) {
