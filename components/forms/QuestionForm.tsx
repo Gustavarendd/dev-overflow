@@ -24,6 +24,7 @@ import { Badge } from '../ui/badge';
 import { createQuestion, editQuestion } from '@/lib/actions/question.action';
 import { useTheme } from '@/context/ThemeProvider';
 import { ITag } from '@/database/tag.model';
+import { toast } from '../ui/use-toast';
 
 interface Props {
   mongoUserId: string;
@@ -68,6 +69,9 @@ const QuestionForm = ({ mongoUserId, type, questionDetails }: Props) => {
           path: pathname,
         });
         router.push(`/question/${parsedQuestionDetails._id}`);
+        toast({
+          title: 'Question updated',
+        });
       } else {
         await createQuestion({
           title: values.title,
@@ -77,8 +81,17 @@ const QuestionForm = ({ mongoUserId, type, questionDetails }: Props) => {
           path: pathname,
         });
         router.push('/');
+        toast({
+          title: 'Question posted',
+          description: 'Your question has been posted successfully',
+        });
       }
     } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Something went wrong',
+        variant: 'destructive',
+      });
     } finally {
       setIsSubmitting(false);
     }

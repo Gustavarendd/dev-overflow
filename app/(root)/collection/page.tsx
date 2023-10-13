@@ -2,14 +2,21 @@ import Filter from '@/components/shared/Filter';
 import NoResult from '@/components/shared/NoResult';
 import QuestionCard from '@/components/cards/QuestionCard';
 import LocalSearch from '@/components/shared/search/LocalSearch';
-
 import { QuestionFilters } from '@/constants/filters';
-
 import { getSavedQuestion } from '@/lib/actions/user.action';
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dev Overflow | Collection',
+  description: 'Collection page of Dev Overflow',
+  icons: {
+    icon: '/assets/images/site-logo.svg',
+  },
+};
 
 export default async function Page({ searchParams }: SearchParamsProps) {
   const { userId } = auth();
@@ -38,7 +45,7 @@ export default async function Page({ searchParams }: SearchParamsProps) {
           otherClasses="min-h-[56px] sm:min-w-[170px]"
         />
       </div>
-      <div className="mt-10 flex flex-col gap-6">
+      <div className="mt-12 flex flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question: any) => (
             <QuestionCard

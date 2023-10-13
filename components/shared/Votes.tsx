@@ -5,11 +5,12 @@ import {
   downvoteQuestion,
   upvoteQuestion,
 } from '@/lib/actions/question.action';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { downvoteAnswer, upvoteAnswer } from '@/lib/actions/answer.action';
 import { toggleSaveQuestion } from '@/lib/actions/user.action';
 import { useEffect } from 'react';
 import { viewQuestion } from '@/lib/actions/interaction.action';
+import { toast } from '../ui/use-toast';
 
 interface Props {
   upvotes: number;
@@ -33,7 +34,6 @@ const Votes = ({
   hasSaved,
 }: Props) => {
   const pathname = usePathname();
-  const router = useRouter();
 
   const handleSave = async () => {
     await toggleSaveQuestion({
@@ -41,10 +41,20 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+    toast({
+      title: `Question ${
+        hasSaved ? 'removed from' : 'saved to'
+      } your collection`,
+      variant: hasSaved ? 'destructive' : 'default',
+    });
   };
 
   const handleVote = async (action: string) => {
-    if (!userId) return;
+    if (!userId)
+      return toast({
+        title: 'Please log in',
+        description: 'You have to log in first',
+      });
     if (action === 'upVote') {
       if (type === 'Question') {
         await upvoteQuestion({
@@ -54,6 +64,10 @@ const Votes = ({
           hasDownVoted,
           path: pathname,
         });
+        toast({
+          title: `Upvote ${hasUpVoted ? 'removed' : 'added'}`,
+          variant: hasUpVoted ? 'destructive' : 'default',
+        });
       } else if (type === 'Answer') {
         await upvoteAnswer({
           userId: JSON.parse(userId),
@@ -61,6 +75,10 @@ const Votes = ({
           hasUpVoted,
           hasDownVoted,
           path: pathname,
+        });
+        toast({
+          title: `Upvote ${hasUpVoted ? 'removed' : 'added'}`,
+          variant: hasUpVoted ? 'destructive' : 'default',
         });
       }
       return;
@@ -74,6 +92,10 @@ const Votes = ({
           hasDownVoted,
           path: pathname,
         });
+        toast({
+          title: `Downvote ${hasDownVoted ? 'removed' : 'added'}`,
+          variant: hasDownVoted ? 'destructive' : 'default',
+        });
       } else if (type === 'Answer') {
         await downvoteAnswer({
           userId: JSON.parse(userId),
@@ -81,6 +103,10 @@ const Votes = ({
           hasUpVoted,
           hasDownVoted,
           path: pathname,
+        });
+        toast({
+          title: `Downvote ${hasDownVoted ? 'removed' : 'added'}`,
+          variant: hasDownVoted ? 'destructive' : 'default',
         });
       }
       return;

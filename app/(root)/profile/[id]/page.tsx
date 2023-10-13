@@ -11,6 +11,15 @@ import ProfileLink from '@/components/shared/ProfileLink';
 import Stats from '@/components/shared/Stats';
 import QuestionsTab from '@/components/shared/QuestionsTab';
 import AnswersTab from '@/components/shared/AnswersTab';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dev Overflow | Profile',
+  description: 'Profile page of Dev Overflow',
+  icons: {
+    icon: '/assets/images/site-logo.svg',
+  },
+};
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const userInfo = await getUserInfo({ userId: params.id });

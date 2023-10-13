@@ -6,6 +6,15 @@ import TagCard from '@/components/cards/TagCard';
 import NoResult from '@/components/shared/NoResult';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dev Overflow | Tags',
+  description: 'Tags page of Dev Overflow',
+  icons: {
+    icon: '/assets/images/site-logo.svg',
+  },
+};
 
 export default async function Page({ searchParams }: SearchParamsProps) {
   const result = await getAllTags({

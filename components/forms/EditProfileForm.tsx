@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { ProfileFormSchema } from '@/lib/validations';
 import { updateUser } from '@/lib/actions/user.action';
+import { toast } from '../ui/use-toast';
 
 interface Props {
   mongoUser: string;
@@ -60,7 +61,15 @@ const EditProfileForm = ({ mongoUser }: Props) => {
         path: pathname,
       });
       router.push(`/profile/${parsedUserDetails.clerkId}`);
+      toast({
+        title: 'Profile updated',
+      });
     } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Something went wrong',
+        description: 'Please try again',
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -82,7 +91,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -100,7 +109,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -120,7 +129,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
                 <Input
                   type="url"
                   placeholder="https://www.example.com"
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -138,7 +147,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Input
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   {...field}
                 />
               </FormControl>
@@ -159,7 +168,7 @@ const EditProfileForm = ({ mongoUser }: Props) => {
               </FormLabel>
               <FormControl className="mt-3.5">
                 <Textarea
-                  className="no-focus paragraph-regular background-light700_dark300 light-border-2 text-dark300_light700 min-h-[98px] border"
+                  className="no-focus paragraph-regular background-light800_dark300 light-border-2 text-dark300_light700 min-h-[98px] border"
                   {...field}
                 />
               </FormControl>

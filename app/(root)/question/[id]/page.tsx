@@ -12,6 +12,15 @@ import { auth } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dev Overflow | Question',
+  description: 'Question page of Dev Overflow',
+  icons: {
+    icon: '/assets/images/site-logo.svg',
+  },
+};
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const result = await getQuestionById({ questionId: params.id });

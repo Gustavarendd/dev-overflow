@@ -6,6 +6,15 @@ import UserCard from '@/components/cards/UserCard';
 import Link from 'next/link';
 import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dev Overflow | Community',
+  description: 'Community page of Dev Overflow',
+  icons: {
+    icon: '/assets/images/site-logo.svg',
+  },
+};
 
 export default async function Page({ searchParams }: SearchParamsProps) {
   const result = await getAllUsers({
