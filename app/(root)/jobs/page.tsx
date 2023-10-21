@@ -5,9 +5,8 @@ import { SearchParamsProps } from '@/types';
 import Pagination from '@/components/shared/Pagination';
 import { Metadata } from 'next';
 import NoResult from '@/components/shared/NoResult';
-import { fetchJobs } from '@/app/api/JSearch/route';
 import JobCard from '@/components/cards/JobCard';
-import { getAllLocations } from '@/lib/utils';
+import { fetchJobs, getAllLocations } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Dev Overflow | Jobs',
