@@ -4,7 +4,7 @@ import React from 'react';
 const Loading = () => {
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900">Saved Questions</h1>
+      <h1 className="h1-bold text-dark100_light900">Jobs</h1>
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <Skeleton className="flex min-h-[56px] grow items-center rounded-[10px]" />
