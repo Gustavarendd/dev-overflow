@@ -117,6 +117,7 @@ const JobCard = ({
           </div>
 
           <Link
+            target="_blank"
             href={jobAction}
             className="flex gap-2 items-center"
           >
