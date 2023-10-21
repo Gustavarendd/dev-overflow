@@ -6,7 +6,7 @@ import Pagination from '@/components/shared/Pagination';
 import { Metadata } from 'next';
 import NoResult from '@/components/shared/NoResult';
 import JobCard from '@/components/cards/JobCard';
-import { fetchJobs, getAllLocations } from '@/lib/utils';
+import { fetchJobs, getAllLocations, getGeoLocation } from '@/lib/utils';
 
 export const metadata: Metadata = {
   title: 'Dev Overflow | Jobs',
@@ -17,9 +17,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Page({ searchParams }: SearchParamsProps) {
+  const geoLocation = await getGeoLocation();
+
   const { result, isNext } = await fetchJobs({
-    searchQuery: searchParams.q,
-    filter: searchParams.location,
+    searchQuery: searchParams.q || `Developer jobs in`,
+    filter: searchParams.location || geoLocation?.country,
     page: searchParams.page ? +searchParams.page : 1,
   });
 

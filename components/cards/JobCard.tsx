@@ -76,13 +76,13 @@ const JobCard = ({
                 height={15}
               />
               <p className="text-dark200_light800 text-center text-sm font-medium">
-                {`${city}, ${country}`}
+                {city ? `${city}, ${country}` : country}
               </p>
             </div>
           </div>
         </div>
         <div className="company-description">
-          <p className="text-dark300_light700 text-sm leading-[140%] max-md:max-w-full line-clamp-2">
+          <p className="text-dark300_light700 body-regular line-clamp-2">
             {description}
           </p>
         </div>
@@ -91,36 +91,28 @@ const JobCard = ({
             <div className="flex gap-2 items-center">
               <Image
                 loading="lazy"
-                src="/assets/icons/clock.svg"
+                src="/assets/icons/clock-2.svg"
                 className="object-contain"
                 alt="Clock"
-                width={15}
-                height={15}
+                width={20}
+                height={20}
               />
-
-              <div className="job-type-text">
-                <p className="text-slate-400 text-sm font-medium leading-[130%] self-stretch">
-                  {jobType}
-                </p>
-              </div>
+              <p className="text-light-500 body-medium">{jobType}</p>
             </div>
             <div className="flex gap-2 items-center">
               <Image
                 loading="lazy"
                 src="/assets/icons/currency-dollar-circle.svg"
-                className="object-cover"
+                className="object-contain"
                 alt="Salary Range Icon"
-                width={15}
-                height={15}
+                width={20}
+                height={20}
               />
-
-              <div className="salary-range-text">
-                <p className="text-slate-400 text-sm font-medium leading-[130%] self-stretch">
-                  {minSalary && maxSalary
-                    ? `${formatNumber(minSalary)} - ${formatNumber(maxSalary)}`
-                    : 'Not disclosed'}
-                </p>
-              </div>
+              <p className="text-light-500 body-medium">
+                {minSalary && maxSalary
+                  ? `${formatNumber(minSalary)} - ${formatNumber(maxSalary)}`
+                  : 'Not disclosed'}
+              </p>
             </div>
           </div>
 

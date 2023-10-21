@@ -164,7 +164,7 @@ type FilterProps = {
 
 export const fetchJobs = async (filters: FilterProps) => {
   try {
-    const { searchQuery = 'developer', page = 1, filter } = filters;
+    const { searchQuery, page = 1, filter } = filters;
     let query;
     if (filter) {
       query = `${searchQuery} ${filter}`;
@@ -190,5 +190,16 @@ export const fetchJobs = async (filters: FilterProps) => {
   } catch (error) {
     console.log(error);
     throw new Error('Error fetching jobs');
+  }
+};
+
+export const getGeoLocation = async () => {
+  try {
+    const response = await fetch('http://ip-api.com/json/');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error('Error fetching location');
   }
 };
