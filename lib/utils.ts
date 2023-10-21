@@ -142,3 +142,16 @@ export const assignBadges = (params: BadgeParam) => {
 
   return badgeCounts;
 };
+
+export const getAllLocations = async () => {
+  try {
+    const response = await fetch(
+      'https://restcountries.com/v3.1/all?fields=name,flags,cca2',
+    );
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error('Error fetching locations');
+  }
+};

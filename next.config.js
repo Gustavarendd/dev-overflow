@@ -13,6 +13,10 @@ const nextConfig = {
       },
       {
         protocol: 'http',
+        hostname: '*',
+      },
+      {
+        protocol: 'http',
         hostname: 'img.clerk.com',
       },
     ],

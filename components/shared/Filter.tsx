@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Select,
   SelectContent,
@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { formUrlQuery } from '@/lib/utils';
 
 interface Props {
@@ -18,9 +18,16 @@ interface Props {
   }[];
   otherClasses?: string;
   containerClasses?: string;
+  placeholder?: string;
+  location?: boolean;
 }
 
-const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
+const Filter = ({
+  filters,
+  otherClasses,
+  containerClasses,
+  location,
+}: Props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -29,7 +36,7 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
   const onChangeHandler = (value: string) => {
     const newUrl = formUrlQuery({
       params: searchParams.toString(),
-      key: 'filter',
+      key: location ? 'location' : 'filter',
       value,
     });
 
@@ -46,10 +53,12 @@ const Filter = ({ filters, otherClasses, containerClasses }: Props) => {
           className={`${otherClasses} body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5 focus:ring-0 ring-offset-0 focus:ring-offset-0`}
         >
           <div className="line-clamp-1 flex-1 text-left">
-            <SelectValue placeholder="Select a Filter" />
+            <SelectValue
+              placeholder={location ? 'Select a location' : 'Select a Filter'}
+            />
           </div>
         </SelectTrigger>
-        <SelectContent className="text-dark500_light700 small-regular border-none background-light900_dark300">
+        <SelectContent className="text-dark500_light700 small-regular border-none background-light900_dark300 overflow-auto max-h-[500px]">
           <SelectGroup>
             {filters.map(filter => (
               <SelectItem
