@@ -10,6 +10,7 @@ import {
 import Tag, { ITag } from '@/database/tag.model';
 import { FilterQuery } from 'mongoose';
 import Question from '@/database/question.model';
+import Interaction from '@/database/interaction.model';
 
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
@@ -21,11 +22,33 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
       throw new Error('User not found');
     }
 
-    return [
-      { _id: '1', name: 'tag1' },
-      { _id: '2', name: 'tag2' },
-      { _id: '3', name: 'tag3' },
-    ];
+    const topInteractedTags = await Interaction.aggregate([
+      { $match: { user: user._id } },
+      { $unwind: '$tags' },
+      {
+        $group: {
+          _id: '$tags',
+
+          totalTags: { $sum: 1 },
+        },
+      },
+      { $sort: { totalTags: -1 } },
+      { $limit: limit },
+    ]);
+
+    const tagIds = topInteractedTags.map(tag =>
+      JSON.stringify(tag._id).replace(/"/g, ''),
+    );
+
+    const tags = await Tag.find({ _id: { $in: tagIds } });
+
+    const tagsWithTotal = tags.map(tag => {
+      const total = topInteractedTags.find(
+        topTag => topTag._id.toString() === tag._id.toString(),
+      );
+      return { ...tag.toJSON(), total: total?.totalTags };
+    });
+    return tagsWithTotal;
   } catch (error) {
     console.log(error);
     throw error;

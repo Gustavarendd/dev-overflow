@@ -36,9 +36,7 @@ interface Props {
 const Stats = ({ totalQuestions, totalAnswers, badges, reputation }: Props) => {
   return (
     <div className="mt-10">
-      <h4 className="h3-semibold text-dark200_light900">
-        Stats - {reputation}
-      </h4>
+      <h4 className="h3-semibold text-dark200_light900">Stats</h4>
       <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-5 mt-5">
         <div className="light-border background-light900_dark-300 flex flex-wrap items-center justify-evenly gap-4 rounded-md p-6 shadow-light300 border dark:shadow-dark-200">
           <div>

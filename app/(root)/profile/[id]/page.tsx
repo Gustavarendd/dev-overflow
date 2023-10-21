@@ -12,6 +12,9 @@ import Stats from '@/components/shared/Stats';
 import QuestionsTab from '@/components/shared/QuestionsTab';
 import AnswersTab from '@/components/shared/AnswersTab';
 import { Metadata } from 'next';
+import TopTags from '@/components/shared/TopTags';
+import { getTopInteractedTags } from '@/lib/actions/tag.action';
+import { log } from 'console';
 
 export const metadata: Metadata = {
   title: 'Dev Overflow | Profile',
@@ -24,6 +27,12 @@ export const metadata: Metadata = {
 const Page = async ({ params, searchParams }: URLProps) => {
   const userInfo = await getUserInfo({ userId: params.id });
   const { userId: clerkId } = auth();
+
+  const interactedTags = await getTopInteractedTags({
+    userId: userInfo.user._id,
+    limit: 10,
+  });
+  console.log(interactedTags);
 
   return (
     <>
@@ -121,6 +130,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
             />
           </TabsContent>
         </Tabs>
+        <TopTags tags={interactedTags} />
       </div>
     </>
   );

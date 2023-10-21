@@ -16,6 +16,7 @@ interface Props {
 
 const UserCard = async ({ user }: Props) => {
   const interactedTags = await getTopInteractedTags({ userId: user._id });
+
   return (
     <Link
       href={`/profile/${user.clerkId}`}
@@ -40,7 +41,7 @@ const UserCard = async ({ user }: Props) => {
         <div className="mt-5">
           {interactedTags.length > 0 ? (
             <div className="flex items-center gap-2">
-              {interactedTags.map(tag => (
+              {interactedTags.map((tag: any) => (
                 <RenderTag
                   key={tag._id}
                   _id={tag._id}
