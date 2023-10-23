@@ -184,7 +184,7 @@ const AnswerForm = ({ userId, questionId, question }: Props) => {
                       content_style:
                         'body { font-family:Inter; font-size:16px }',
                       skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
-                      content_css: mode === 'dark' ? 'dark' : 'light',
+                      content_css: mode === 'dark' ? 'dark' : 'default',
                     }}
                   />
                 </FormControl>

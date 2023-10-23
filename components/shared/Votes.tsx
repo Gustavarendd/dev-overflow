@@ -118,7 +118,6 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       userId: userId ? JSON.parse(userId) : undefined,
     });
-    console.log('MORE VIEWS');
   }, [itemId, userId, pathname]);
 
   return (
